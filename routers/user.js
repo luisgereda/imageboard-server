@@ -3,6 +3,7 @@ const { Router } = express;
 const User = require("../models").user;
 const router = new Router();
 module.exports = router;
+const bcrypt = require("bcrypt");
 
 router.get("/", async (req, res, next) => {
   try {
@@ -15,12 +16,16 @@ router.get("/", async (req, res, next) => {
 
 // router.post("/", async (req, res, next) => {
 //   try {
-//     const { email, passwoord, fullName } = req.body;
-//     if (!email || !passwoord || !fullName) {
+//     const { email, password, fullName } = req.body;
+//     if (!email || !password || !fullName) {
 //       res.status(400).send("missing parameters");
 //     } else {
-//       const create = await User.create(req.body);
-//       res.send("user created", create);
+//       const newUser = await User.create({
+//         email,
+//         password,
+//         fullName,
+//       });
+//       res.json(newUser);
 //     }
 //   } catch (e) {
 //     next(e);
@@ -33,10 +38,48 @@ router.post("/", async (req, res, next) => {
     if (!email || !password || !fullName) {
       res.status(400).send("missing parameters");
     } else {
-      const newUser = await User.create(req.body);
-      res.json(newUser);
+      const newUser = await User.create({
+        email,
+        password: bcrypt.hashSync(password, 10),
+        fullName,
+      });
+      res.send(newUser);
     }
   } catch (e) {
     next(e);
   }
 });
+
+// router.post("/", async (req, res, next) => {
+//   try {
+//     const { email, password, fullName } = req.body;
+//     if (!email || !password || !fullName) {
+//       res.status(400).send("missing parameters");
+//     } else {
+//       const newUser = await User.create({
+//         email,
+//         // Here, when handing down the password to the create method we hash it.
+//         password: bcrypt.hashSync(password, 10),
+//         fullName,
+//       });
+
+//       res.json(newUser);
+//     }
+//   } catch (e) {
+//     next(e);
+//   }
+// });
+
+// router.post("/", async (req, res, next) => {
+//   try {
+//     const { email, password, fullName } = req.body;
+//     if (!email || !password || !fullName) {
+//       res.status(400).send("missing parameters");
+//     } else {
+//       const newUser = await User.create(req.body);
+//       res.json(newUser);
+//     }
+//   } catch (e) {
+//     next(e);
+//   }
+// });
